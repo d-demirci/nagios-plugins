@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-args=$(getopt -l "url:dns:" -o "u:d:h" -- "$@")
+args=$(getopt -l "url:dns:expected:" -o "u:d:e:h" -- "$@")
 
 eval set -- "$args"
 while [ $# -ge 1 ]; do
