@@ -51,3 +51,37 @@ else
         echo "FW UYARI :Degisiklik Yok $total."
         exit 0
 fi
+
+# How to use this ?
+# Make sure that you cloned or downloaded netmiko repo
+# because this script uses test_checkpoint_simple.py file from that repo
+# define  command in commands.cfg
+#e.g. 
+#define command{
+#        command_name    check_cpfw_sh
+#        command_line    /usr/local/nagios/libexec/fw.sh -i $ARG1$ -u $ARG2$ -p $ARG3$ -s $ARG4$
+#}
+
+
+# define service in a file for example firewall.cfg
+#define service {
+#        use generic-service
+#        host_name CPFWMgm
+#        name checkpoint_ip_host
+#        service_description CPFWMgm Ip and Host Count
+#        check_command check_cpfw_sh!$USER13$!$USER10$!$USER11$!$USER12$
+#        max_check_attempts 1
+#        normal_check_interval 5
+#        retry_check_interval 1
+#}
+
+# make sure your $USER13$ points to ip address of Checkpoint Management Server
+# $USER10$ points to username
+# $USER11$ points to password
+# $USER12$ points to expert password
+
+# if you define this service in a file called firewall.cfg in /usr/local/nagios/etc/objects
+# you should add this line to nagios.cfg without '#'
+# cfg_file=/usr/local/nagios/etc/objects/firewalls.cfg
+
+# add anything to issues if you encounter sth not expected
