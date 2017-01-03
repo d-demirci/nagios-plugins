@@ -1,0 +1,46 @@
+#!/bin/bash
+
+
+args=$(getopt -l "url:dns:" -o "u:d:h" -- "$@")
+
+eval set -- "$args"
+while [ $# -ge 1 ]; do
+        case "$1" in
+                --)
+                    # No more options left.
+                    shift
+                    break
+                   ;;
+                -u|--url)
+                        url="$2"
+                        shift
+                        ;;
+		-d|--dns)
+			dns="$2"
+			shift
+			;;
+		-e|--expected)
+			expected="$2"
+			shift
+			;;
+                -h)
+                        echo "Usage :\n ./check_jdns -u <URL> -d <DNS_IP> -e <EXPECTED_IP>"
+			
+                        exit 0
+                        ;;
+        esac
+
+        shift
+done
+
+
+result = $(host $url $dns | awk --re-interval 'match( $0, /has address{1,}/) { print substr($0,RSTART+RLENGTH+1) }')
+
+if [[ $result -eq $expected ]];then
+	echo "DNS OK: Url:$url, IP: $result, Beklenen: $expected - Degisiklik Yok"
+	exit 0
+else 
+	echo "DNS KRITIK UYARI : URL: $url , IP: $result, Beklenen : $expected"
+	exit 2
+fi
+
