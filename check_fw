@@ -1,0 +1,53 @@
+#!/bin/bash
+
+
+args=$(getopt -l "ipaddr:user:password:secret:" -o "i:u:p:s:h" -- "$@")
+
+eval set -- "$args"
+while [ $# -ge 1 ]; do
+        case "$1" in
+                --)
+                    # No more options left.
+                    shift
+                    break
+                   ;;
+                -i|--ipaddr)
+                        ipaddr="$2"
+                        shift
+                        ;;
+                -u|--user)
+                        user="$2"
+                        shift
+                        ;;
+                -p|--password)
+                        password="$2"
+                        shift
+                        ;;
+		-s|--secret)
+			secret="$2"
+			shift
+			;;
+                -h)
+                        echo "Usage : ./fw.sh -i <IPADDRESS> -u <USERNAME> -p <PASSWORD> -s <SECRET>"
+
+                        exit 0
+                        ;;
+        esac
+
+        shift
+done
+
+
+total=$(echo -e | /usr/local/nagios/libexec/test_checkpoint_simple.py -i $ipaddr -u $user -p $password -s $secret  | egrep 'Toplam|Etkilenen|Degisiklik' )
+
+#if [ "$total" ]
+if [[ $total =~ .*Eklenen.* ]];then
+        echo "FW KRITIK UYARI- $total."
+        exit 2
+elif [[ $total =~ .*Silinen.* ]];then 
+        echo "FW KRITIK UYARI- $total."
+        exit 2
+else
+        echo "FW UYARI :Degisiklik Yok $total."
+        exit 0
+fi
